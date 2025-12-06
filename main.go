@@ -1,24 +1,32 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"os"
 )
 
 func main() {
-	filePath := "message.txt"
-
-	file, err := os.Open(filePath)
+	file, err := os.Open("message.txt")
 	if err != nil {
-		log.Fatal("Unable to open the file")
+		log.Fatal("unable to open the file")
 	}
-	defer file.Close()
+	for line := range getLineChannel(file) {
+		fmt.Printf("read %s\n", line)
+	}
 
-	scan := bufio.NewScanner(file)
-	for scan.Scan() {
-		line := scan.Text()
-		fmt.Println("read", line)
-	}
+}
+
+func getLineChannel(f io.ReadCloser) <-chan string {
+	ch := make(chan string)
+
+	go func() {
+		defer close(ch)
+		defer f.Close()
+
+		buf := make([]byte, 8)
+		line := []byte{}
+
+	}()
 }
