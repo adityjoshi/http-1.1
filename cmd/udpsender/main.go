@@ -25,6 +25,15 @@ func main() {
 
 	for {
 		fmt.Println(">")
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			log.Printf("read error: %v", err)
+			continue
+		}
+		_, err = conn.Write([]byte(line))
+		if err != nil {
+			log.Printf("write error: %v", err)
+		}
 	}
 
 }
