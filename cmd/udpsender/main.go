@@ -10,7 +10,7 @@ import (
 
 func main() {
 
-	addr, err := net.ResolveUDPAddr("UDP", "localhost:42069")
+	addr, err := net.ResolveUDPAddr("udp", "localhost:42069")
 	if err != nil {
 		log.Fatal("error is ->", err)
 	}
