@@ -31,12 +31,13 @@ func parseRequestLine(b string) (*RequestLine, string, error) {
 		return nil, restOfMsg, Error_Bad_Request_Line
 	}
 
-	return &RequestLine{
+	rl := &RequestLine{
 		Method:        parts[0],
 		RequestTarget: parts[1],
 		HttpVersion:   parts[2],
-	}, restOfMsg, nil
+	}
 
+	return rl, restOfMsg, nil
 }
 
 func RequestFromReader(reader io.Reader) (*Request, error) {
