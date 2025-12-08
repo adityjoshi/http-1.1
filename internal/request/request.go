@@ -28,6 +28,12 @@ func parseRequestLine(b string) (*RequestLine, string ,error) {
 		return  Error_Bad_Request_Line
 	}
 
+	return &RequestLine{
+		Method:parts[0],
+		RequestTarget:parts[1],
+		HttpVersion:parts[2],
+	},restOfMsg,nil
+
 
 }
 
