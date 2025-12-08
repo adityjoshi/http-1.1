@@ -17,6 +17,14 @@ type RequestLine struct {
 }
 
 var Error_Bad_Request_Line = fmt.Errorf("malformed http")
+var Error_HTTP_Mismatch = fmt.Errorf("Http mismatch")
+
+func (r *RequestLine) CheckVersion() bool {
+	if r.HttpVersion != "HTTP/1.1" {
+		return false
+	}
+	return true
+}
 
 func parseRequestLine(b string) (*RequestLine, string, error) {
 	idx := strings.Index(b, "\r\n")
@@ -35,6 +43,9 @@ func parseRequestLine(b string) (*RequestLine, string, error) {
 		Method:        parts[0],
 		RequestTarget: parts[1],
 		HttpVersion:   parts[2],
+	}
+	if !rl.CheckVersion() {
+		return nil, restOfMsg, Error_HTTP_Mismatch
 	}
 
 	return rl, restOfMsg, nil
