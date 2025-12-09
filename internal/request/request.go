@@ -60,8 +60,9 @@ func newRequest() *Request {
 	}
 }
 
-func (r *Request) parse(data []byte) (int, error) {
+func (r *Request) Parse(data []byte) (int, error) {
 
+	return 0, Error_Bad_Request_Line
 }
 
 func (r *Request) done() bool {
