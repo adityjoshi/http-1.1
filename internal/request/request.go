@@ -59,13 +59,30 @@ func newRequest() *Request {
 		State: Stateinit,
 	}
 }
+
+func (r *Request) parse(data []byte) (int, error) {
+
+}
+
+func (r *Request) done() bool {
+	return r.State == StatDone
+}
+
 func RequestFromReader(reader io.Reader) (*Request, error) {
 	request := newRequest()
 
+	buf := make([]byte, 1024)
+	bufIdx := 0
 	for {
+		n, err := reader.Read(buf[bufIdx:])
+		if err != nil {
+			return nil, err
+		}
+
+		request.Parse(buf[:n+bufIdx])
 
 	}
-	line, err := io.ReadAll(reader)
+
 	if err != nil {
 		return nil, err
 	}
