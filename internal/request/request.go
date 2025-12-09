@@ -54,7 +54,17 @@ func parseRequestLine(b string) (*RequestLine, string, error) {
 	return rl, restOfMsg, nil
 }
 
+func newRequest() *Request {
+	return &Request{
+		State: Stateinit,
+	}
+}
 func RequestFromReader(reader io.Reader) (*Request, error) {
+	request := newRequest()
+
+	for {
+
+	}
 	line, err := io.ReadAll(reader)
 	if err != nil {
 		return nil, err
