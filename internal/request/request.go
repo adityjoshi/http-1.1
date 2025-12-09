@@ -10,7 +10,7 @@ type ParseState string
 
 const (
 	Stateinit ParseState = "init"
-	StatDone  ParseState = "done"
+	StateDone ParseState = "done"
 )
 
 type Request struct {
@@ -42,7 +42,7 @@ func parseRequestLine(b string) (*RequestLine, string, error) {
 
 	httpParts := strings.Split(parts[2], "/")
 
-	if len(httpParts) != 2 || httpParts[0] != "HTTP" || httpParts[1] != "1.1" {
+	if len(httpParts) != 2 || string(httpParts[0]) != "HTTP" || string(httpParts[1]) != "1.1" {
 		return nil, restOfMsg, Error_Bad_Request_Line
 	}
 
@@ -63,19 +63,23 @@ func newRequest() *Request {
 
 func (r *Request) Parse(data []byte) (int, error) {
 
-	if r.State == StatDone {
+	if r.State == StateDone {
 		return 0, Error_Reading_From_Done_State
 	}
 
 	if r.State == Stateinit {
-		parseRequestLine(string(data))
+		_, noOfBytes, err := parseRequestLine(string(data))
+		if err != nil {
+			return 0, err
+		}
+		return noOfBytes, nil
 	}
-
+	r.State = StateDone
 	return 0, Error_Bad_Request_Line
 }
 
 func (r *Request) done() bool {
-	return r.State == StatDone
+	return r.State == StateDone
 }
 
 func RequestFromReader(reader io.Reader) (*Request, error) {
