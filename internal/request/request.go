@@ -63,8 +63,12 @@ func newRequest() *Request {
 
 func (r *Request) Parse(data []byte) (int, error) {
 
+	if r.State == StatDone {
+		return 0, Error_Reading_From_Done_State
+	}
+
 	if r.State == Stateinit {
-		parseRequestLine()
+		parseRequestLine(string(data))
 	}
 
 	return 0, Error_Bad_Request_Line
