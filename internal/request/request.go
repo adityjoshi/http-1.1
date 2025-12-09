@@ -67,18 +67,17 @@ func (r *Request) Parse(data []byte) (int, error) {
 	if r.State == StateDone {
 		return 0, Error_Reading_From_Done_State
 	}
-	if r.State != StateDone || r.State != Stateinit {
+	if r.State != Stateinit {
 		return 0, fmt.Errorf("Unknown State")
 	}
 
-	if r.State == Stateinit {
-		_, noOfBytes, err := parseRequestLine(string(data))
-		if err != nil {
-			return 0, err
-		}
-		return noOfBytes, nil
+	_, noOfBytes, err := parseRequestLine(string(data))
+	if err != nil {
+		return 0, err
 	}
 	r.State = StateDone
+	return noOfBytes, nil
+
 	return 0, Error_Bad_Request_Line
 }
 
