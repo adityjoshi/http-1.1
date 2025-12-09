@@ -25,6 +25,7 @@ type RequestLine struct {
 }
 
 var Error_Bad_Request_Line = fmt.Errorf("malformed http")
+var Error_Reading_From_Done_State = fmt.Errorf("error reading from the done state")
 
 func parseRequestLine(b string) (*RequestLine, string, error) {
 	idx := strings.Index(b, "\r\n")
@@ -61,6 +62,10 @@ func newRequest() *Request {
 }
 
 func (r *Request) Parse(data []byte) (int, error) {
+
+	if r.State == Stateinit {
+		parseRequestLine()
+	}
 
 	return 0, Error_Bad_Request_Line
 }
