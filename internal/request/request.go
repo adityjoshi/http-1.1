@@ -6,8 +6,16 @@ import (
 	"strings"
 )
 
+type ParseState string
+
+const (
+	Stateinit ParseState = "init"
+	StatDone  ParseState = "done"
+)
+
 type Request struct {
 	RequestLine RequestLine
+	State       ParseState
 }
 
 type RequestLine struct {
