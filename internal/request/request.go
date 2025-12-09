@@ -72,28 +72,20 @@ func RequestFromReader(reader io.Reader) (*Request, error) {
 	request := newRequest()
 
 	buf := make([]byte, 1024)
-	bufIdx := 0
-	for {
-		n, err := reader.Read(buf[bufIdx:])
+	bufLen := 0
+	for !request.done() {
+		n, err := reader.Read(buf[bufLen:])
 		if err != nil {
 			return nil, err
 		}
-
-		request.Parse(buf[:n+bufIdx])
+		bufLen += n
+		readN, err := request.Parse(buf[:bufLen])
+		if err != nil {
+			return nil, err
+		}
+		copy(buf, buf[readN:bufLen])
+		bufLen -= readN
 
 	}
-
-	if err != nil {
-		return nil, err
-	}
-	str := string(line)
-
-	rl, _, err := parseRequestLine(str)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Request{
-		RequestLine: *rl,
-	}, err
+	return request, nil
 }
