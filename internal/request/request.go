@@ -28,6 +28,7 @@ var Error_Bad_Request_Line = fmt.Errorf("malformed http")
 var Error_Reading_From_Done_State = fmt.Errorf("error reading from the done state")
 
 func parseRequestLine(b string) (*RequestLine, string, error) {
+	byteSize := len(b)
 	idx := strings.Index(b, "\r\n")
 	if idx == -1 {
 		return nil, b, nil
@@ -65,6 +66,9 @@ func (r *Request) Parse(data []byte) (int, error) {
 
 	if r.State == StateDone {
 		return 0, Error_Reading_From_Done_State
+	}
+	if r.State != StateDone || r.State != Stateinit {
+		return 0, fmt.Errorf("Unknown State")
 	}
 
 	if r.State == Stateinit {
