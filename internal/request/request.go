@@ -27,23 +27,25 @@ type RequestLine struct {
 var Error_Bad_Request_Line = fmt.Errorf("malformed http")
 var Error_Reading_From_Done_State = fmt.Errorf("error reading from the done state")
 
-func parseRequestLine(b string) (*RequestLine, string, error) {
+func parseRequestLine(b string) (*RequestLine, int, string, error) {
+
 	idx := strings.Index(b, "\r\n")
 	if idx == -1 {
-		return nil, b, nil
-	}
-	start := b[:idx]
-	restOfMsg := b[idx+len("\r\n"):]
 
-	parts := strings.Split(start, " ")
+		return nil, 0, b, nil
+	}
+
+	line := b[:idx]
+	rest := b[idx+2:]
+
+	parts := strings.Split(line, " ")
 	if len(parts) != 3 {
-		return nil, restOfMsg, Error_Bad_Request_Line
+		return nil, 0, rest, Error_Bad_Request_Line
 	}
 
 	httpParts := strings.Split(parts[2], "/")
-
-	if len(httpParts) != 2 || string(httpParts[0]) != "HTTP" || string(httpParts[1]) != "1.1" {
-		return nil, restOfMsg, Error_Bad_Request_Line
+	if len(httpParts) != 2 || httpParts[0] != "HTTP" || httpParts[1] != "1.1" {
+		return nil, 0, rest, Error_Bad_Request_Line
 	}
 
 	rl := &RequestLine{
@@ -52,9 +54,9 @@ func parseRequestLine(b string) (*RequestLine, string, error) {
 		HttpVersion:   httpParts[1],
 	}
 
-	return rl, restOfMsg, nil
+	consumed := idx + 2
+	return rl, consumed, rest, nil
 }
-
 func newRequest() *Request {
 	return &Request{
 		State: Stateinit,
@@ -67,15 +69,19 @@ func (r *Request) Parse(data []byte) (int, error) {
 		return 0, Error_Reading_From_Done_State
 	}
 	if r.State != Stateinit {
-		return 0, fmt.Errorf("Unknown State")
+		return 0, fmt.Errorf("unknown State")
 	}
 
-	_, noOfBytes, err := parseRequestLine(string(data))
+	rl, noOfBytes, _, err := parseRequestLine(string(data))
 	if err != nil {
 		return 0, err
 	}
+	if noOfBytes == 0 {
+		return 0, nil
+	}
+	r.RequestLine = *rl
 	r.State = StateDone
-	return noOfBytes, fmt.Errorf("No error")
+	return noOfBytes, nil
 }
 
 func (r *Request) done() bool {
