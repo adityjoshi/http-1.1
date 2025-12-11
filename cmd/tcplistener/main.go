@@ -22,7 +22,7 @@ func main() {
 		log.Println("A new client connection has been made:", conn.RemoteAddr())
 		line, err := request.RequestFromReader(conn)
 		if err != nil {
-			log.Fatalf("error", "error", err)
+			log.Fatalf("error", err)
 		}
 		fmt.Println("Request line:")
 		fmt.Printf("- Method: %s\n", line.RequestLine.Method)
